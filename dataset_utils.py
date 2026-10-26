@@ -1,4 +1,5 @@
 from sklearn.model_selection import train_test_split
+from json import loads, dumps
 
 def load_dataset(dataset):     
     data = []
@@ -68,25 +69,36 @@ def get_length_bucket(row):
 
 def stratified_split(dataset):
 
-    labels = []
+    try:
+        with open('split/train.txt','r',encoding='utf-8-sig') as f:
+            train_data = loads(f.read())
+        with open('split/test.txt','r',encoding='utf-8-sig') as f:
+            test_data = loads(f.read())
+    except FileNotFoundError:
+        labels = []
 
-    for row in dataset:
+        for row in dataset:
 
-        label = (
-            str(get_score_bucket(row))
-            + "_"
-            + get_length_bucket(row)
-            + "_"
-            + str(get_name_bucket(row))
+            label = (
+                str(get_score_bucket(row))
+                + "_"
+                + get_length_bucket(row)
+                + "_"
+                + str(get_name_bucket(row))
+            )
+
+            labels.append(label)
+
+        train_data, test_data = train_test_split(
+            dataset,
+            test_size=0.2,
+            random_state=1,
+            stratify=labels
         )
 
-        labels.append(label)
-
-    train_data, test_data = train_test_split(
-        dataset,
-        test_size=0.2,
-        random_state=1,
-        stratify=labels
-    )
+        with open('split/train.txt','w+',encoding='utf-8-sig') as f:
+            f.write(dumps(train_data))
+        with open('split/test.txt','w+',encoding='utf-8-sig') as f:
+            f.write(dumps(test_data))
 
     return train_data, test_data

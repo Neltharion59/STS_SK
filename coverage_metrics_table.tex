@@ -1,0 +1,165 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{caption}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xcolor}
+
+\geometry{margin=2cm}
+\sisetup{detect-weight=true, detect-family=true, round-mode=places, round-precision=1}
+
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{midgray}{gray}{0.85}
+
+\begin{document}
+
+\section*{Coverage Metrics for Slovak Conceptual Dictionary and WordNet}
+\label{sec:coverage-metrics}
+
+\begin{table}[htbp]
+\centering
+\caption{Overall coverage statistics for the SICK-SK dataset (9,840 sentence pairs, 130,003 word tokens, 4,925 unique word forms).}
+\label{tab:overall-coverage}
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{Metric} & \multicolumn{2}{c}{Conceptual Dictionary} & \multicolumn{2}{c}{WordNet (Slovak)} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+& Count & \% & Count & \% \\
+\midrule
+Words with lemma match & 26,203 & 20.2 & 26,203 & 20.2 \\
+Words with entry & 26,203 & 20.2 & 21,717 & 16.7 \\
+Words with category/namespace & 24,564 & 18.9 & \textemdash & \textemdash \\
+Words with synonyms & 15,709 & 12.1 & \textemdash & \textemdash \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Conditional coverage given a lemma match (26,203 words).}
+\label{tab:conditional-coverage}
+\begin{tabular}{lcc}
+\toprule
+Metric & Conceptual Dictionary & WordNet (Slovak) \\
+\midrule
+Entry coverage & 100.0\% & 82.9\% \\
+Category/namespace coverage & 93.7\% & \textemdash \\
+Synonym coverage & 60.0\% & \textemdash \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Unique lemma and word-form coverage across the dataset.}
+\label{tab:unique-coverage}
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{Metric} & \multicolumn{2}{c}{Conceptual Dictionary} & \multicolumn{2}{c}{WordNet (Slovak)} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+& Unique Lemmas & Unique Word Forms & Unique Lemmas & Unique Word Forms \\
+\midrule
+Total with entry & 750 & 708 & 497 & 470 \\
+With category & 665 & 651 & \textemdash & \textemdash \\
+With synonyms & 303 & 299 & \textemdash & \textemdash \\
+\% of unique word forms (4,925) & \textemdash & 14.4\% & \textemdash & 9.5\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Sentence-level hit rates (19,680 sentences). A sentence has a \textit{hit} if at least one word matches the resource.}
+\label{tab:sentence-hit-rates}
+\begin{tabular}{lccc}
+\toprule
+Resource & Sentences with Hit & \% of Sentences & Avg. Hits per Sentence \\
+\midrule
+Lemma match & 16,602 & 84.4\% & 1.3 \\
+Conceptual Dictionary entry & 16,602 & 84.4\% & 1.3 \\
+Category/namespace & 16,440 & 83.5\% & 1.2 \\
+Synonyms & 12,968 & 65.9\% & 0.8 \\
+WordNet entry & 15,479 & 78.7\% & 1.1 \\
+CD \textbf{or} WordNet & 16,602 & 84.4\% & \textemdash \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Pair-level hit rates (9,840 sentence pairs). A pair has a \textit{hit} if \textbf{both} sentences have at least one matching word.}
+\label{tab:pair-hit-rates}
+\begin{tabular}{lccc}
+\toprule
+Resource & Pairs with Hit (Both) & \% of Pairs & $\Delta$ vs. Sentence-level \\
+\midrule
+Lemma match & 7,590 & 77.1\% & $-$7.3 pp \\
+Conceptual Dictionary entry & 7,590 & 77.1\% & $-$7.3 pp \\
+Category/namespace & 7,485 & 76.1\% & $-$7.4 pp \\
+Synonyms & 5,383 & 54.7\% & $-$11.2 pp \\
+WordNet entry & 6,841 & 69.5\% & $-$9.2 pp \\
+CD \textbf{or} WordNet & 7,590 & 77.1\% & $-$7.3 pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Per-sentence averages (all words vs. unique words within sentence).}
+\label{tab:per-sentence}
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{Metric} & \multicolumn{2}{c}{All Words (6.6 words/sent.)} & \multicolumn{2}{c}{Unique Words (6.5 words/sent.)} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+& Avg. Count & \% & Avg. Count & \% \\
+\midrule
+Words with lemma & 1.3 & 23.9\% & 1.3 & 23.9\% \\
+Words with CD category & 1.2 & 22.7\% & 1.2 & 22.7\% \\
+Words with synonyms & 0.8 & 14.7\% & 0.8 & 14.8\% \\
+Words with WordNet entry & 1.1 & 20.2\% & 1.1 & 20.2\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Coverage by word frequency bins (4,925 unique word forms). High-frequency words show substantially better resource coverage.}
+\label{tab:frequency-bins}
+\begin{tabular}{lrrrrrr}
+\toprule
+Frequency Bin & Unique Words & \% of Total Occ. & Lemma \% & CD Entry \% & WN Entry \% \\
+\midrule
+1 (hapax) & 105 & 0.1\% & 15.2 & 15.2 & 7.6 \\
+2--5 & 2,037 & 3.9\% & 13.5 & 13.5 & 8.3 \\
+6--10 & 1,230 & 7.8\% & 13.4 & 13.4 & 9.1 \\
+11--50 & 1,214 & 20.1\% & 15.5 & 15.5 & 10.8 \\
+51--100 & 174 & 9.4\% & 19.5 & 19.5 & 14.4 \\
+101--500 & 134 & 21.8\% & 14.9 & 14.9 & 11.9 \\
+501+ & 31 & 36.8\% & 29.0 & 29.0 & 25.8 \\
+\midrule
+\textbf{Total} & \textbf{4,925} & \textbf{100\%} & \textbf{14.4} & \textbf{14.4} & \textbf{9.5} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison of Conceptual Dictionary (CD) vs. WordNet (WN) coverage.}
+\label{tab:cd-vs-wn}
+\begin{tabular}{lccc}
+\toprule
+Metric & CD & WN & Difference \\
+\midrule
+Words with entry (all tokens) & 26,203 & 21,717 & $+$4,486 \\
+Unique lemmas with entry & 750 & 497 & $+$253 \\
+Unique word forms with entry & 708 & 470 & $+$238 \\
+Coverage given lemma match & 100.0\% & 82.9\% & $+$17.1 pp \\
+Sentences with hit (at least one) & 84.4\% & 78.7\% & $+$5.7 pp \\
+Pairs with hit (both sentences) & 77.1\% & 69.5\% & $+$7.6 pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

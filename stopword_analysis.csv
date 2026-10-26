@@ -1,0 +1,6 @@
+﻿metric;total_tokens;unique_forms
+total_tokens;130003;4641
+stopword_tokens;34311;118
+stopword_ratio_pct;26.39;2.54
+non_stopword_tokens;95692;4523
+non_stopword_ratio_pct;73.61;97.46

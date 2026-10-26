@@ -12,7 +12,7 @@ configs = data["configs"]
 scores = []
 
 for i in range(len(configs)):
-    model_scores = results[str(i)]
+    model_scores = results[i]
     r = pearsonr(human_scores, model_scores)[0]
     scores.append((i, r, configs[i]))
 
@@ -31,11 +31,12 @@ with open("pearson_results_final_final.csv", "w", newline="", encoding="utf-8-si
         "direction",
         "power",
         "index_weight",
-        "power_scope"
+        "power_scope",
+        "tree_type"
     ])
 
     for i, r, config in scores:
-        similarity_type, matching, word_agg, sentence_agg, direction, power, index_w, power_scope = config
+        similarity_type, matching, word_agg, sentence_agg, direction, power, index_w, power_scope, tree_type = config
 
         if index_w is None:
             index_w = "none"
@@ -49,7 +50,8 @@ with open("pearson_results_final_final.csv", "w", newline="", encoding="utf-8-si
             direction,
             power,
             index_w,
-            power_scope
+            power_scope,
+            tree_type
         ])
 
 

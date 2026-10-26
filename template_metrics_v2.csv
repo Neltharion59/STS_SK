@@ -1,0 +1,12 @@
+﻿metric;conceptual_dictionary;wordnet
+HEADER;entries in conceptual dictionary (%);entries in wordnet (%)
+unique words with entry;632 (16.9%);422 (11.3%)
+total words in the dataset with entry;26203 (20.2%);21717 (16.7%)
+entries per a sentence;avg 1.3 (23.9%);avg 1.1 (20.2%)
+ratio of sentence pairs with at least one entry in each sentence;7590 (77.1%);6841 (69.5%)
+ratio of sentence pairs with exactly one sentence without entry;2009 (20.4%);2551 (25.9%)
+\hline;;
+unique words with a category;579 (15.4%);N/A (no category in WordNet)
+unique words with a category given lemma;651 (91.6%);N/A (no category in WordNet)
+unique words with synonyms;257 (6.9%);N/A (synonyms via synsets not directly comparable)
+unique words with synonyms given lemma;299 (40.7%);N/A (synonyms via synsets not directly comparable)

@@ -3,6 +3,7 @@ from scipy.stats import pearsonr, spearmanr, kendalltau
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
+from json import loads
 
 import numpy as np
 
@@ -12,12 +13,25 @@ from api_utils import build_tree_from_concepts
 from similarity import compute_similarity
 
 from dataset_utils import load_dataset
-from dataset_utils import stratified_split
+from final_split import stratified_split
+
+def load_sklep_dataset(filepath='sklep.json'):
+    """Load SKLEP dataset from JSON file."""
+    data = []
+    with open(filepath, "r", encoding="utf-8-sig") as f:
+        for line in f:
+            entry = loads(line.strip())
+            data.append((
+                entry["sentence1"],
+                entry["sentence2"],
+                float(entry["similarity_score"])
+            ))
+    return data
 
 
 dataset = load_dataset("sick_sk.txt")
-
 train_data, test_data = stratified_split(dataset)
+#test_data = load_sklep_dataset()
 
 human_scores = []
 model_scores = []
@@ -39,12 +53,13 @@ for i, (veta1, veta2, skore) in enumerate(test_data):
         root,
         matching="one_to_many",
         word_agg="max",
-        sentence_agg="avg",
+        sentence_agg="max",
         direction="symmetric",
         similarity_type="wupalmer",
-        power="power7",
-        index_weight_type=None,
-        power_scope="local"
+        power="power1",
+        index_weight_type="prime",
+        power_scope="local",
+        tree_type='wn'
     )
 
     model_scores.append(sim)

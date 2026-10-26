@@ -5,6 +5,8 @@ class Node:
         self.name = name
         self.parent = parent
         self.children = []
+        self.printed = False
+        self.visited = False
 
     def add_child(self, child_node):
         current = self
@@ -126,3 +128,17 @@ class Node:
         D = self.max_depth()
 
         return -math.log(dist / (2 * D))
+    
+    def tree_to_couples(self):
+        if not self.printed:
+            for child in self.children:
+                yield (self.name, child.name)
+            self.printed = True
+            for child in self.children:
+                for (p, ch) in child.tree_to_couples():
+                    yield (p, ch)
+
+    def tree_to_text(self):
+        couples = [f"{parent} - {child}" for (parent, child) in self.tree_to_couples()]
+        couples_string = ('\n').join(couples)
+        return couples_string

@@ -218,3 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 udaje.txt
+
+# Large experiment output files
+experiment_scores_final_final.json
+experiment_scores_final_final.json.bak

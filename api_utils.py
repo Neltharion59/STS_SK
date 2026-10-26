@@ -1,4 +1,4 @@
-import requests, json, time
+import requests, json, time, os
 from tree import Node
 
 token = None
@@ -18,6 +18,17 @@ try:
 except FileNotFoundError:
     lemma_cache = {}
 
+try:
+    with open("caches/endpoint_caches/cache_extractor.json", "r", encoding = "utf-8-sig") as f:
+        extractor_cache = json.load(f)
+except FileNotFoundError:
+    extractor_cache = {}
+
+try:
+    with open("caches/endpoint_caches/cache_concept.json", "r", encoding = "utf-8-sig") as f:
+        concept_endpoint_cache = json.load(f)
+except FileNotFoundError:
+    concept_endpoint_cache = {}
 
 missing_lemmas = set()
 
@@ -30,6 +41,8 @@ try:
 except FileNotFoundError:
     with open("missing_lemmas.csv", "w", encoding="utf-8-sig") as f:
         f.write("idx,lemma\n")
+        f.flush()
+        os.fsync(f.fileno())
     
 
 def get_token():
@@ -41,9 +54,10 @@ def get_token():
     endpoint = "https://pojmy.kinit.sk/api/auth"
 
     with open("udaje.txt", "r") as file:
-        info = file.readline().split()
+        line = file.readline()
+        info = line.split(' ')
         email = info[0]
-        password = info[1]
+        password = ' '.join(info[1:])
 
     logindata = {"email": email, "password": password}
 
@@ -55,31 +69,32 @@ def get_token():
 
     return token
 
-def extract_lemmas(sentence): 
-    extractor_url = "https://pojmy.kinit.sk/api/extractor"
-    extractor_headers = {"Authorization": f"Bearer {get_token()}"}
-    extractor_params = {"text": sentence}
-    extractor_response = requests.get(extractor_url, params=extractor_params, headers=extractor_headers, timeout = 10)
+def extract_lemmas(sentence):
+    # Check if raw response is cached
+    if sentence in extractor_cache:
+        extractor_data = extractor_cache[sentence]
+    else:
+        # Make API call
+        extractor_url = "https://pojmy.kinit.sk/api/extractor"
+        extractor_headers = {"Authorization": f"Bearer {get_token()}"}
+        extractor_params = {"text": sentence}
+        extractor_response = requests.get(extractor_url, params=extractor_params, headers=extractor_headers, timeout = 10)
 
-    try:
-        extractor_data = extractor_response.json()
-    except:
-        return []
+        try:
+            extractor_data = extractor_response.json()
+        except:
+            return []
+        
+        # Cache the raw response
+        extractor_cache[sentence] = extractor_data
+        with open("caches/endpoint_caches/cache_extractor.json", "w", encoding="utf-8-sig") as f:
+            json.dump(extractor_cache, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
     
-    lemmas = []
+    # Process the response to extract lemmas
+    lemmas = [record['lemma'] for record in extractor_data['results'] if record['lemma'] is not None]
     
-    for word in extractor_data["results"]:
-        lemma = word[0]["lemma"]
-
-        if word[0]["concepts"] != []:
-            lemmas.append(lemma)
-        else:
-            if lemma not in missing_lemmas:
-                with open("missing_lemmas.csv", "a", encoding="utf-8-sig") as f:
-                    f.write(f"{len(missing_lemmas)},{lemma}\n")
-
-                missing_lemmas.add(lemma)
-
     return lemmas
 
 def get_sentence_lemmas(sentence):
@@ -88,6 +103,8 @@ def get_sentence_lemmas(sentence):
 
         with open("lemma_cache.json", "w", encoding="utf-8-sig") as f:
             json.dump(lemma_cache, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
 
     return lemma_cache[sentence]
 
@@ -142,19 +159,30 @@ def build_tree_from_concepts(lemmas):
 
     return root
 
-def get_concept_data(lemma):  
+def get_concept_data(lemma):
     if lemma in concept_cache:
         return concept_cache[lemma]
 
-    time.sleep(0.5)
+    # Check if raw API response is cached
+    if lemma in concept_endpoint_cache:
+        data = concept_endpoint_cache[lemma]
+    else:
+        # Make API call with rate limiting
+        time.sleep(0.5)
 
-    endpoint = "https://pojmy.kinit.sk/api/concept"
-    headers = {"Authorization": f"Bearer {get_token()}"}
-    params = {"lemma": lemma}
+        endpoint = "https://pojmy.kinit.sk/api/concept"
+        headers = {"Authorization": f"Bearer {get_token()}"}
+        params = {"lemma": lemma}
 
-    
-    response = requests.get(endpoint, params=params, headers=headers)
-    data = response.json()
+        response = requests.get(endpoint, params=params, headers=headers)
+        data = response.json()
+        
+        # Cache the raw response
+        concept_endpoint_cache[lemma] = data
+        with open("caches/endpoint_caches/cache_concept.json", "w", encoding="utf-8-sig") as f:
+            json.dump(concept_endpoint_cache, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
 
     results = data.get("results", {})
 
@@ -174,6 +202,8 @@ def get_concept_data(lemma):
     if not has_record and lemma not in missing_lemmas:
         with open("missing_lemmas.csv", "a", encoding="utf-8-sig") as f:
             f.write(f"{len(missing_lemmas)},{lemma}\n")
+            f.flush()
+            os.fsync(f.fileno())
 
         missing_lemmas.add(lemma)
 
@@ -198,15 +228,33 @@ def get_concept_data(lemma):
         "namespace": namespace,
         "has_record": has_record
     }
+    
+    # Write concept cache to disk
+    with open("concept_cache.json", "w", encoding="utf-8-sig") as f:
+        json.dump(concept_cache, f, ensure_ascii=False, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
 
     return concept_cache[lemma]
 
-def get_terms_for_word(word):  
-    concept_url = "https://pojmy.kinit.sk/api/concept"
-    headers = {"Authorization": f"Bearer {get_token()}"}
-    params = {"lemma": word}
-    response = requests.get(concept_url, params=params, headers=headers)
-    data = response.json()
+def get_terms_for_word(word):
+    # Check if raw API response is cached
+    if word in concept_endpoint_cache:
+        data = concept_endpoint_cache[word]
+    else:
+        # Make API call
+        concept_url = "https://pojmy.kinit.sk/api/concept"
+        headers = {"Authorization": f"Bearer {get_token()}"}
+        params = {"lemma": word}
+        response = requests.get(concept_url, params=params, headers=headers)
+        data = response.json()
+        
+        # Cache the raw response
+        concept_endpoint_cache[word] = data
+        with open("caches/endpoint_caches/cache_concept.json", "w", encoding="utf-8-sig") as f:
+            json.dump(concept_endpoint_cache, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
 
     results = data.get("results", {})
 

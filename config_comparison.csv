@@ -1,0 +1,5 @@
+Category;Count;Pearson;Spearman;Kendall Tau;MAE;MSE
+neither_has_entry;78;nan;nan;nan;2.900000;8.808718
+one_has_entry;155;nan;nan;nan;2.335613;6.521883
+both_have_entries;8607;0.608208;0.568367;0.411085;0.707387;0.775656
+all_pairs;8840;0.547397;0.540470;0.390534;0.755283;0.947289
